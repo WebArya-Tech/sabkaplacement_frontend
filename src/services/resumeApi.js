@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5000/api';
+import { BASE_URL } from './api';
 
 const authHeaders = () => {
     const token = localStorage.getItem('token');

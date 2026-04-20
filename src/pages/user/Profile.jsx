@@ -2,7 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Footer from "../../components/Footer";
 import CopyNavbar from "../../components copy/Navbar";
-import { getProfile, updateProfile } from "../../services/api";
+import { 
+  getProfile, 
+  updateProfile, 
+  FILE_BASE_URL 
+} from "../../services/api";
 
 function Toast({ msg, onClose }) {
   return (
@@ -198,10 +202,10 @@ export default function Profile() {
   const handleShare = () => { if (navigator.clipboard) navigator.clipboard.writeText(window.location.href).then(() => showToast("Profile link copied!")); else showToast("Profile link copied!"); };
   const handleDownloadCV = () => {
     if (!resumeName) { showToast('No resume uploaded'); return; }
-    // agar cloudinary URL hai toh direct use karo, warna localhost se banao
+    // agar cloudinary URL hai toh direct use karo, warna backend URL se banao
     const url = resumeName.startsWith('http')
       ? resumeName
-      : `http://localhost:5000/${resumeName}`
+      : `${FILE_BASE_URL}/${resumeName}`
     const a = document.createElement('a')
     a.href = url
     a.download = resumeName.split('/').pop() || 'resume'

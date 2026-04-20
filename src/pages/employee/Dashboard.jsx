@@ -4,6 +4,7 @@ import EmployeeNavbar from '../../components/EmployeeNavbar'
 import EmployeeFooter from '../../components/EmployeeFooter'
 import { getCompanyApplications, getCompanyJobs, updateCompanyApplicationStatus } from '../../services/companyApi'
 import { deleteJob } from '../../services/jobsApi'
+import { FILE_BASE_URL } from '../../services/api'
 
 const statusStyle = {
   Active:  { bg: '#F0FDF4', color: '#16A34A', dot: '#16A34A' },
@@ -60,7 +61,10 @@ export default function Dashboard() {
         // Priority for resume: 
         // 1. Application-specific resume (the one they used when applying)
         // 2. Profile-wide resume
-        const resumeUrl = app.resume || candidate.resume || ''
+        let resumeUrl = app.resume || candidate.resume || ''
+        if (resumeUrl && !resumeUrl.startsWith('http')) {
+          resumeUrl = `${FILE_BASE_URL}/${resumeUrl}`
+        }
         
         return {
           id: app._id,

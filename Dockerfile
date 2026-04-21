@@ -1,32 +1,33 @@
-# ─────────────────────────────────────────────────────────
-#  User Frontend — Dockerfile (Sabplacement)
-#  Development and Production build
-# ─────────────────────────────────────────────────────────
-
-FROM node:20-alpine
-
-# Set metadata labels
-LABEL maintainer="Job Portal Team"
-LABEL description="User Frontend - Sabplacement"
-LABEL version="1.0.0"
+# Build stage
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
 # Copy package files
-COPY package.json package-lock.json ./
+COPY package*.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm install
 
 # Copy source code
 COPY . .
 
-# Expose port
-EXPOSE 5173
+# Build the application
+RUN npm run build
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost:5173/ || exit 1
+# Production stage
+FROM node:22-alpine
 
-# Start development server
-CMD ["npm", "run", "dev", "--", "--host"]
+WORKDIR /app
+
+# Install serve package to run the frontend
+RUN npm install -g serve
+
+# Copy built application from builder stage
+COPY --from=builder /app/dist ./dist
+
+# Expose port 9021
+EXPOSE 9021
+
+# Start the application on port 9021
+CMD ["serve", "-s", "dist", "-l", "9021"]

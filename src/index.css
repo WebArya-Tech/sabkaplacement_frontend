@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@source "../src";
 
 /* Hide scrollbars globally for scrollbar-hide class */
 .scrollbar-hide {

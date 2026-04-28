@@ -3,31 +3,38 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
+# ← ADD THESE LINES to pass env vars at build time
+ARG VITE_API_BASE_URL
+ARG VITE_APP_NAME
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV VITE_APP_NAME=$VITE_APP_NAME
+
 COPY package*.json ./
 
-# Install dependencies
+
 RUN npm install
 
-# Copy source code
+
 COPY . .
 
-# Build the application
+
 RUN npm run build
+
 
 # Production stage
 FROM node:22-alpine
 
 WORKDIR /app
 
-# Install serve package to run the frontend
+
 RUN npm install -g serve
 
-# Copy built application from builder stage
+
 COPY --from=builder /app/dist ./dist
 
-# Expose port 9021
+
+
 EXPOSE 9021
 
-# Start the application on port 9021
+
 CMD ["serve", "-s", "dist", "-l", "9021"]

@@ -16,7 +16,12 @@ export default function TrainerLogin() {
     setLoading(true)
     try {
       const res = await loginTrainer({ email, password })
-      if (res.token) localStorage.setItem('trainerToken', res.token)
+      if (res.token) {
+        localStorage.setItem('trainerToken', res.token)
+        if (res.user) {
+          localStorage.setItem('trainerData', JSON.stringify(res.user))
+        }
+      }
       navigate('/trainer/dashboard')
     } catch (err) {
       setError(err.message)
@@ -74,7 +79,7 @@ export default function TrainerLogin() {
                   </button>
                 </div>
                 <div className="flex justify-end mt-1.5">
-                  <button type="button" className="text-xs text-[#3385AA] hover:underline font-medium">Forgot password?</button>
+                  <button type="button" onClick={() => navigate('/forgot-password?role=trainer')} className="text-xs text-[#3385AA] hover:underline font-medium">Forgot password?</button>
                 </div>
               </div>
 

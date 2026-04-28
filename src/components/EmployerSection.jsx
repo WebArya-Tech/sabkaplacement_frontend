@@ -1,6 +1,8 @@
-﻿import { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const EmployerSection = () => {
+  const navigate = useNavigate();
   const [modal, setModal] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
@@ -248,7 +250,7 @@ const EmployerSection = () => {
                     </div>
 
                     <div className="flex justify-end">
-                      <button type="button" className="text-sm hover:underline" style={{ color: '#3385AA' }}>
+                      <button type="button" onClick={() => navigate('/forgot-password?role=company')} className="text-sm hover:underline" style={{ color: '#3385AA' }}>
                         Forgot password?
                       </button>
                     </div>

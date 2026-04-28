@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { getTrainerProfile } from '../services/trainerApi'
 
 const navItems = [
   { label: 'Dashboard',     to: '/trainer/dashboard',     icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -13,8 +14,34 @@ export default function TrainerNavbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
+  const [trainer, setTrainer] = useState(() => {
+    const saved = localStorage.getItem('trainerData')
+    return saved ? JSON.parse(saved) : null
+  })
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const data = await getTrainerProfile()
+        setTrainer(data)
+        localStorage.setItem('trainerData', JSON.stringify(data))
+      } catch (err) {
+        console.error("Failed to load trainer profile:", err)
+      }
+    }
+    if (!trainer) {
+      loadProfile()
+    }
+  }, [trainer])
 
   const isActive = (path) => location.pathname === path
+
+  const handleSignOut = () => {
+    localStorage.removeItem('trainerToken')
+    localStorage.removeItem('trainerData')
+    setProfileOpen(false)
+    navigate('/')
+  }
 
   const notifications = [
     { id: 1, text: '2 students submitted assignments', time: '10 min ago', unread: true },
@@ -102,15 +129,15 @@ export default function TrainerNavbar() {
           <div className="relative">
             <button onClick={() => { setProfileOpen(p => !p); setNotifOpen(false) }}
               className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#3385AA] to-[#317FA4] flex items-center justify-center text-white font-bold text-sm shadow-sm hover:shadow-md transition-shadow">
-              T
+              {trainer?.name ? trainer.name.charAt(0).toUpperCase() : 'T'}
             </button>
             {profileOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
                 <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-[#d6eaf2] z-50 overflow-hidden">
                   <div className="px-4 py-3 bg-gradient-to-r from-[#eaf4f9] to-[#eaf4f9] border-b border-[#d6eaf2]">
-                    <p className="text-sm font-bold text-[#317FA4]">Trainer Account</p>
-                    <p className="text-xs text-gray-500 truncate">trainer@example.com</p>
+                    <p className="text-sm font-bold text-[#317FA4]">{trainer?.name || 'Trainer Account'}</p>
+                    <p className="text-xs text-gray-500 truncate">{trainer?.email || 'trainer@example.com'}</p>
                   </div>
                   <div className="py-1">
                     <Link to="/trainer/profile" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-[#eaf4f8] hover:text-[#317FA4] transition-colors">
@@ -118,7 +145,7 @@ export default function TrainerNavbar() {
                       My Profile
                     </Link>
                     <div className="border-t border-gray-100 mt-1 pt-1">
-                      <button onClick={() => { setProfileOpen(false); navigate('/') }}
+                      <button onClick={handleSignOut}
                         className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 w-full transition-colors">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
                         Sign Out

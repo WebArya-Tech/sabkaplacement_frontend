@@ -12,7 +12,10 @@ export default function TrainerDashboard() {
 
   useEffect(() => {
     getTrainerProfile()
-      .then((data) => setProfile(data))
+      .then((data) => {
+        setProfile(data)
+        console.log("Trainer Profile Data:", data) // Added console log
+      })
       .catch((err) => setError(err.message || 'Failed to load dashboard'))
       .finally(() => setLoading(false))
   }, [])

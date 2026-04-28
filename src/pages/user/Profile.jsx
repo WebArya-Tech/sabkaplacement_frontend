@@ -2,10 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Footer from "../../components/Footer";
 import CopyNavbar from "../../components copy/Navbar";
-import { 
-  getProfile, 
-  updateProfile, 
-  FILE_BASE_URL 
+import {
+  BASE_URL,
+  getProfile,
+  updateProfile,
+  FILE_BASE_URL
 } from "../../services/api";
 
 function Toast({ msg, onClose }) {
@@ -84,12 +85,12 @@ function SectionCard({ title, icon, children, onEdit }) {
 }
 
 const IconBriefcase = () => (<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>);
-const IconGrad    = () => (<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" /></svg>);
-const IconSkill   = () => (<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>);
-const IconDoc     = () => (<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>);
-const IconLang    = () => (<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>);
-const IconCert    = () => (<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>);
-const IconPref    = () => (<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>);
+const IconGrad = () => (<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" /></svg>);
+const IconSkill = () => (<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>);
+const IconDoc = () => (<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>);
+const IconLang = () => (<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>);
+const IconCert = () => (<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>);
+const IconPref = () => (<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>);
 
 export default function Profile() {
   const [toast, setToast] = useState(null);
@@ -99,9 +100,9 @@ export default function Profile() {
   const closeModal = () => setModal(null);
 
   const [pageLoading, setPageLoading] = useState(true);
-  const [pageError, setPageError]     = useState('');
+  const [pageError, setPageError] = useState('');
 
-  const photoRef  = useRef();
+  const photoRef = useRef();
   const resumeRef = useRef();
 
   const [photoImage, setPhotoImage] = useState(null);
@@ -109,7 +110,7 @@ export default function Profile() {
   const [resumeFile, setResumeFile] = useState(null);
   const [profileStats, setProfileStats] = useState({ profileViews: 0, applications: 0, interviews: 0, savedJobs: 0 });
 
-  const [info, setInfo] = useState({ name:'', role:'', company:'', qualification:'', location:'', email:'', phone:'' });
+  const [info, setInfo] = useState({ name: '', role: '', company: '', qualification: '', location: '', email: '', phone: '' });
   const [draftInfo, setDraftInfo] = useState({});
 
   const [summary, setSummary] = useState('');
@@ -120,13 +121,13 @@ export default function Profile() {
     getProfile()
       .then((data) => {
         setInfo({
-          name:          data.fullName                        || '',
-          role:          data.workExperience                  || '',
-          company:       data.education?.collegeName          || '',
+          name: data.fullName || '',
+          role: data.workExperience || '',
+          company: data.education?.collegeName || '',
           qualification: data.education?.highestQualification || '',
           location: `${data.location?.city?.trim() || ''}, ${data.location?.state?.trim() || ''}, ${data.location?.country?.trim() || ''}`.replace(/(^,\s*|,\s*$)/g, '').replace(/,\s*,/g, ','),
-          email:         data.email                          || '',
-          phone:         data.mobileNumber                   || '',
+          email: data.email || '',
+          phone: data.mobileNumber || '',
         });
         setSummary(data.summary || '');
         setSkills(Array.isArray(data.skills) ? data.skills : []);
@@ -148,7 +149,7 @@ export default function Profile() {
           interviews: data.stats?.interviews || 0,
           savedJobs: data.stats?.savedJobs || 0,
         });
-        if (data.resume)   setResumeName(data.resume)  // full URL/path store karo;
+        if (data.resume) setResumeName(data.resume)  // full URL/path store karo;
         if (data.photoUrl) setPhotoImage(data.photoUrl);
       })
       .catch((err) => setPageError(err.message))
@@ -156,12 +157,12 @@ export default function Profile() {
   }, []);
 
   const [experiences, setExperiences] = useState([]);
-  const emptyExp = { role:"", company:"", type:"Full-time", duration:"", location:"", desc:"" };
+  const emptyExp = { role: "", company: "", type: "Full-time", duration: "", location: "", desc: "" };
   const [draftExp, setDraftExp] = useState(emptyExp);
   const [editingExpId, setEditingExpId] = useState(null);
 
   const [education, setEducation] = useState([]);
-  const emptyEdu = { degree:"", institute:"", year:"", grade:"" };
+  const emptyEdu = { degree: "", institute: "", year: "", grade: "" };
   const [draftEdu, setDraftEdu] = useState(emptyEdu);
   const [editingEduId, setEditingEduId] = useState(null);
 
@@ -169,10 +170,10 @@ export default function Profile() {
   const [newSkill, setNewSkill] = useState("");
 
   const [certs, setCerts] = useState([]);
-  const emptyCert = { name:"", issuer:"", year:"" };
+  const emptyCert = { name: "", issuer: "", year: "" };
   const [draftCert, setDraftCert] = useState(emptyCert);
 
-  const [prefs, setPrefs] = useState({ jobType:"", desiredRole:"", ctc:"", notice:"", city:"", relocation:"" });
+  const [prefs, setPrefs] = useState({ jobType: "", desiredRole: "", ctc: "", notice: "", city: "", relocation: "" });
   const [draftPrefs, setDraftPrefs] = useState({});
 
   const [languages, setLanguages] = useState([]);
@@ -182,12 +183,10 @@ export default function Profile() {
   const handleResumeChange = async (e) => {
     const f = e.target.files[0];
     if (f) {
-      setResumeName(f.name);
       setResumeFile(f);
-      
       const fd = new FormData();
       fd.append('resume', f);
-      
+
       try {
         const updated = await updateProfile(fd);
         if (updated.resume) {
@@ -200,19 +199,39 @@ export default function Profile() {
     }
   };
   const handleShare = () => { if (navigator.clipboard) navigator.clipboard.writeText(window.location.href).then(() => showToast("Profile link copied!")); else showToast("Profile link copied!"); };
-  const handleDownloadCV = () => {
+  const handleDownloadCV = async () => {
     if (!resumeName) { showToast('No resume uploaded'); return; }
-    // agar cloudinary URL hai toh direct use karo, warna backend URL se banao
-    const url = resumeName.startsWith('http')
-      ? resumeName
-      : `${FILE_BASE_URL}/${resumeName}`
-    const a = document.createElement('a')
-    a.href = url
-    a.download = resumeName.split('/').pop() || 'resume'
-    a.target = '_blank'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
+    
+    try {
+      showToast('Downloading resume...');
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${BASE_URL}/candidate/resume/download`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      if (!response.ok) throw new Error('Download failed');
+      
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      
+      // Extract filename from Content-Disposition header or fallback
+      let filename = 'resume.pdf';
+      const disposition = response.headers.get('Content-Disposition');
+      if (disposition) {
+        const match = disposition.match(/filename="?([^";\n]+)"?/);
+        if (match) filename = match[1];
+      }
+      
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
+    } catch (err) {
+      console.error('Download failed:', err);
+      showToast('Failed to download resume');
+    }
   };
 
   const buildFormData = (fields) => {
@@ -226,11 +245,11 @@ export default function Profile() {
     const merged = { ...info, ...draftInfo };
     try {
       await updateProfile(buildFormData({
-        fullName:     merged.name,
+        fullName: merged.name,
         mobileNumber: merged.phone,
-        email:        merged.email,
+        email: merged.email,
         workExperience: merged.role,
-        collegeName:  merged.company,
+        collegeName: merged.company,
       }));
       setInfo(merged);
       closeModal();
@@ -314,8 +333,8 @@ export default function Profile() {
     <div className="min-h-screen bg-[#f4f9fc]">
       <CopyNavbar />
 
-      <input ref={photoRef}  type="file" accept="image/*"           className="hidden" onChange={handlePhotoChange} />
-      <input ref={resumeRef} type="file" accept=".pdf,.doc,.docx"   className="hidden" onChange={handleResumeChange} />
+      <input ref={photoRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+      <input ref={resumeRef} type="file" accept=".pdf,.doc,.docx" className="hidden" onChange={handleResumeChange} />
 
       {toast && <Toast msg={toast} onClose={() => setToast(null)} />}
 
@@ -333,13 +352,13 @@ export default function Profile() {
 
       {modal === "editProfile" && (
         <Modal title="Edit Profile" onClose={closeModal} onSave={saveProfile}>
-          <Field label="Full Name"><Input value={draftInfo.name ?? info.name} onChange={e => setDraftInfo({...draftInfo, name:e.target.value})} /></Field>
-          <Field label="Work Experience"><Input value={draftInfo.role ?? info.role} onChange={e => setDraftInfo({...draftInfo, role:e.target.value})} /></Field>
-          <Field label="College Name"><Input value={draftInfo.company ?? info.company} onChange={e => setDraftInfo({...draftInfo, company:e.target.value})} /></Field>
-          <Field label="Qualification"><Input value={draftInfo.qualification ?? info.qualification} onChange={e => setDraftInfo({...draftInfo, qualification:e.target.value})} /></Field>
-          <Field label="Location"><Input value={draftInfo.location ?? info.location} onChange={e => setDraftInfo({...draftInfo, location:e.target.value})} /></Field>
-          <Field label="Email"><Input type="email" value={draftInfo.email ?? info.email} onChange={e => setDraftInfo({...draftInfo, email:e.target.value})} /></Field>
-          <Field label="Phone"><Input value={draftInfo.phone ?? info.phone} onChange={e => setDraftInfo({...draftInfo, phone:e.target.value})} /></Field>
+          <Field label="Full Name"><Input value={draftInfo.name ?? info.name} onChange={e => setDraftInfo({ ...draftInfo, name: e.target.value })} /></Field>
+          <Field label="Work Experience"><Input value={draftInfo.role ?? info.role} onChange={e => setDraftInfo({ ...draftInfo, role: e.target.value })} /></Field>
+          <Field label="College Name"><Input value={draftInfo.company ?? info.company} onChange={e => setDraftInfo({ ...draftInfo, company: e.target.value })} /></Field>
+          <Field label="Qualification"><Input value={draftInfo.qualification ?? info.qualification} onChange={e => setDraftInfo({ ...draftInfo, qualification: e.target.value })} /></Field>
+          <Field label="Location"><Input value={draftInfo.location ?? info.location} onChange={e => setDraftInfo({ ...draftInfo, location: e.target.value })} /></Field>
+          <Field label="Email"><Input type="email" value={draftInfo.email ?? info.email} onChange={e => setDraftInfo({ ...draftInfo, email: e.target.value })} /></Field>
+          <Field label="Phone"><Input value={draftInfo.phone ?? info.phone} onChange={e => setDraftInfo({ ...draftInfo, phone: e.target.value })} /></Field>
         </Modal>
       )}
 
@@ -351,25 +370,25 @@ export default function Profile() {
 
       {(modal === "addExp" || modal === "editExp") && (
         <Modal title={modal === "editExp" ? "Edit Experience" : "Add Experience"} onClose={closeModal} onSave={saveExp}>
-          <Field label="Job Title"><Input value={draftExp.role} onChange={e => setDraftExp({...draftExp, role:e.target.value})} placeholder="e.g. Senior Frontend Developer" /></Field>
-          <Field label="Company"><Input value={draftExp.company} onChange={e => setDraftExp({...draftExp, company:e.target.value})} placeholder="e.g. TechNova Labs" /></Field>
+          <Field label="Job Title"><Input value={draftExp.role} onChange={e => setDraftExp({ ...draftExp, role: e.target.value })} placeholder="e.g. Senior Frontend Developer" /></Field>
+          <Field label="Company"><Input value={draftExp.company} onChange={e => setDraftExp({ ...draftExp, company: e.target.value })} placeholder="e.g. TechNova Labs" /></Field>
           <Field label="Employment Type">
-            <SelectEl value={draftExp.type} onChange={e => setDraftExp({...draftExp, type:e.target.value})}>
-              {["Full-time","Part-time","Internship","Contract","Freelance"].map(t => <option key={t}>{t}</option>)}
+            <SelectEl value={draftExp.type} onChange={e => setDraftExp({ ...draftExp, type: e.target.value })}>
+              {["Full-time", "Part-time", "Internship", "Contract", "Freelance"].map(t => <option key={t}>{t}</option>)}
             </SelectEl>
           </Field>
-          <Field label="Duration"><Input value={draftExp.duration} onChange={e => setDraftExp({...draftExp, duration:e.target.value})} placeholder="e.g. Jan 2023 - Present" /></Field>
-          <Field label="Location"><Input value={draftExp.location} onChange={e => setDraftExp({...draftExp, location:e.target.value})} placeholder="e.g. Bengaluru, India" /></Field>
-          <Field label="Description"><Textarea value={draftExp.desc} onChange={e => setDraftExp({...draftExp, desc:e.target.value})} placeholder="Describe your responsibilities..." /></Field>
+          <Field label="Duration"><Input value={draftExp.duration} onChange={e => setDraftExp({ ...draftExp, duration: e.target.value })} placeholder="e.g. Jan 2023 - Present" /></Field>
+          <Field label="Location"><Input value={draftExp.location} onChange={e => setDraftExp({ ...draftExp, location: e.target.value })} placeholder="e.g. Bengaluru, India" /></Field>
+          <Field label="Description"><Textarea value={draftExp.desc} onChange={e => setDraftExp({ ...draftExp, desc: e.target.value })} placeholder="Describe your responsibilities..." /></Field>
         </Modal>
       )}
 
       {(modal === "addEdu" || modal === "editEdu") && (
         <Modal title={modal === "editEdu" ? "Edit Education" : "Add Education"} onClose={closeModal} onSave={saveEdu}>
-          <Field label="Degree / Course"><Input value={draftEdu.degree} onChange={e => setDraftEdu({...draftEdu, degree:e.target.value})} placeholder="e.g. B.Tech - Computer Science" /></Field>
-          <Field label="Institute"><Input value={draftEdu.institute} onChange={e => setDraftEdu({...draftEdu, institute:e.target.value})} placeholder="e.g. Delhi Technological University" /></Field>
-          <Field label="Year"><Input value={draftEdu.year} onChange={e => setDraftEdu({...draftEdu, year:e.target.value})} placeholder="e.g. 2019 - 2023" /></Field>
-          <Field label="Grade / CGPA"><Input value={draftEdu.grade} onChange={e => setDraftEdu({...draftEdu, grade:e.target.value})} placeholder="e.g. 8.4 CGPA or 82%" /></Field>
+          <Field label="Degree / Course"><Input value={draftEdu.degree} onChange={e => setDraftEdu({ ...draftEdu, degree: e.target.value })} placeholder="e.g. B.Tech - Computer Science" /></Field>
+          <Field label="Institute"><Input value={draftEdu.institute} onChange={e => setDraftEdu({ ...draftEdu, institute: e.target.value })} placeholder="e.g. Delhi Technological University" /></Field>
+          <Field label="Year"><Input value={draftEdu.year} onChange={e => setDraftEdu({ ...draftEdu, year: e.target.value })} placeholder="e.g. 2019 - 2023" /></Field>
+          <Field label="Grade / CGPA"><Input value={draftEdu.grade} onChange={e => setDraftEdu({ ...draftEdu, grade: e.target.value })} placeholder="e.g. 8.4 CGPA or 82%" /></Field>
         </Modal>
       )}
 
@@ -403,21 +422,21 @@ export default function Profile() {
 
       {modal === "addCert" && (
         <Modal title="Add Certification" onClose={closeModal} onSave={saveCert}>
-          <Field label="Certification Name"><Input value={draftCert.name} onChange={e => setDraftCert({...draftCert, name:e.target.value})} placeholder="e.g. AWS Solutions Architect" /></Field>
-          <Field label="Issuing Organization"><Input value={draftCert.issuer} onChange={e => setDraftCert({...draftCert, issuer:e.target.value})} placeholder="e.g. Amazon Web Services" /></Field>
-          <Field label="Year"><Input value={draftCert.year} onChange={e => setDraftCert({...draftCert, year:e.target.value})} placeholder="e.g. 2024" /></Field>
+          <Field label="Certification Name"><Input value={draftCert.name} onChange={e => setDraftCert({ ...draftCert, name: e.target.value })} placeholder="e.g. AWS Solutions Architect" /></Field>
+          <Field label="Issuing Organization"><Input value={draftCert.issuer} onChange={e => setDraftCert({ ...draftCert, issuer: e.target.value })} placeholder="e.g. Amazon Web Services" /></Field>
+          <Field label="Year"><Input value={draftCert.year} onChange={e => setDraftCert({ ...draftCert, year: e.target.value })} placeholder="e.g. 2024" /></Field>
         </Modal>
       )}
 
       {modal === "editPref" && (
         <Modal title="Edit Job Preferences" onClose={closeModal} onSave={savePrefs}>
-          <Field label="Job Type"><Input value={draftPrefs.jobType ?? prefs.jobType} onChange={e => setDraftPrefs({...draftPrefs, jobType:e.target.value})} /></Field>
-          <Field label="Desired Role"><Input value={draftPrefs.desiredRole ?? prefs.desiredRole} onChange={e => setDraftPrefs({...draftPrefs, desiredRole:e.target.value})} /></Field>
-          <Field label="Expected CTC"><Input value={draftPrefs.ctc ?? prefs.ctc} onChange={e => setDraftPrefs({...draftPrefs, ctc:e.target.value})} /></Field>
-          <Field label="Notice Period"><Input value={draftPrefs.notice ?? prefs.notice} onChange={e => setDraftPrefs({...draftPrefs, notice:e.target.value})} /></Field>
-          <Field label="Preferred City"><Input value={draftPrefs.city ?? prefs.city} onChange={e => setDraftPrefs({...draftPrefs, city:e.target.value})} /></Field>
+          <Field label="Job Type"><Input value={draftPrefs.jobType ?? prefs.jobType} onChange={e => setDraftPrefs({ ...draftPrefs, jobType: e.target.value })} /></Field>
+          <Field label="Desired Role"><Input value={draftPrefs.desiredRole ?? prefs.desiredRole} onChange={e => setDraftPrefs({ ...draftPrefs, desiredRole: e.target.value })} /></Field>
+          <Field label="Expected CTC"><Input value={draftPrefs.ctc ?? prefs.ctc} onChange={e => setDraftPrefs({ ...draftPrefs, ctc: e.target.value })} /></Field>
+          <Field label="Notice Period"><Input value={draftPrefs.notice ?? prefs.notice} onChange={e => setDraftPrefs({ ...draftPrefs, notice: e.target.value })} /></Field>
+          <Field label="Preferred City"><Input value={draftPrefs.city ?? prefs.city} onChange={e => setDraftPrefs({ ...draftPrefs, city: e.target.value })} /></Field>
           <Field label="Open to Relocation">
-            <SelectEl value={draftPrefs.relocation ?? prefs.relocation} onChange={e => setDraftPrefs({...draftPrefs, relocation:e.target.value})}>
+            <SelectEl value={draftPrefs.relocation ?? prefs.relocation} onChange={e => setDraftPrefs({ ...draftPrefs, relocation: e.target.value })}>
               <option>Yes</option><option>No</option>
             </SelectEl>
           </Field>
@@ -429,15 +448,15 @@ export default function Profile() {
           <div className="space-y-3">
             {draftLangs.map((l, i) => (
               <div key={i} className="flex items-center gap-2">
-                <Input value={l.name} onChange={e => { const a=[...draftLangs]; a[i]={...a[i],name:e.target.value}; setDraftLangs(a); }} placeholder="Language" />
-                <SelectEl value={l.level} onChange={e => { const a=[...draftLangs]; a[i]={...a[i],level:e.target.value}; setDraftLangs(a); }}>
-                  {["Native","Fluent","Professional","Conversational","Basic"].map(v => <option key={v}>{v}</option>)}
+                <Input value={l.name} onChange={e => { const a = [...draftLangs]; a[i] = { ...a[i], name: e.target.value }; setDraftLangs(a); }} placeholder="Language" />
+                <SelectEl value={l.level} onChange={e => { const a = [...draftLangs]; a[i] = { ...a[i], level: e.target.value }; setDraftLangs(a); }}>
+                  {["Native", "Fluent", "Professional", "Conversational", "Basic"].map(v => <option key={v}>{v}</option>)}
                 </SelectEl>
-                <button onClick={() => setDraftLangs(draftLangs.filter((_,j) => j !== i))} className="flex-shrink-0 p-1.5 text-red-400 hover:text-red-600 bg-red-50 rounded-lg">x</button>
+                <button onClick={() => setDraftLangs(draftLangs.filter((_, j) => j !== i))} className="flex-shrink-0 p-1.5 text-red-400 hover:text-red-600 bg-red-50 rounded-lg">x</button>
               </div>
             ))}
           </div>
-          <button onClick={() => setDraftLangs([...draftLangs, {name:"",level:"Professional"}])}
+          <button onClick={() => setDraftLangs([...draftLangs, { name: "", level: "Professional" }])}
             className="mt-2 w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-[#aad5e6] rounded-xl text-xs font-semibold text-[#3385AA] hover:bg-[#eaf4f8] transition-colors">
             + Add Language
           </button>
@@ -447,7 +466,7 @@ export default function Profile() {
       <main className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 pt-[70px] sm:pt-[78px] pb-12">{!pageLoading && !pageError && (<>
 
         <div className="bg-white rounded-2xl border border-[#d6eaf2] shadow-sm overflow-hidden mb-5">
-          <div className="h-28 sm:h-36 w-full" style={{ background:"linear-gradient(135deg,#317FA4 0%,#3385AA 55%,#47AEC7 100%)" }} />
+          <div className="h-28 sm:h-36 w-full" style={{ background: "linear-gradient(135deg,#317FA4 0%,#3385AA 55%,#47AEC7 100%)" }} />
 
           <div className="px-4 sm:px-6 pb-5">
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 -mt-10 sm:-mt-12">
@@ -465,7 +484,7 @@ export default function Profile() {
               </div>
 
               <div className="flex flex-wrap items-center gap-2 mt-2 sm:mt-0">
-                <button onClick={() => { setDraftInfo({...info}); setModal("editProfile"); }}
+                <button onClick={() => { setDraftInfo({ ...info }); setModal("editProfile"); }}
                   className="flex items-center gap-1.5 px-4 py-2 bg-[#3385AA] text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-[#317FA4] transition-colors shadow-sm">
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                   Edit Profile
@@ -504,10 +523,10 @@ export default function Profile() {
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mt-4 pt-4 border-t border-[#edf5f9]">
               {[
-                { label:"Profile Views", value:String(profileStats.profileViews || 0), to:null },
-                { label:"Applications", value:String(profileStats.applications || 0), to:"/employee/applications" },
-                { label:"Interviews", value:String(profileStats.interviews || 0), to:null },
-                { label:"Saved Jobs", value:String(profileStats.savedJobs || 0), to:"/saved-jobs" },
+                { label: "Profile Views", value: String(profileStats.profileViews || 0), to: null },
+                { label: "Applications", value: String(profileStats.applications || 0), to: "/employee/applications" },
+                { label: "Interviews", value: String(profileStats.interviews || 0), to: null },
+                { label: "Saved Jobs", value: String(profileStats.savedJobs || 0), to: "/saved-jobs" },
               ].map((s) => (
                 <div key={s.label} className="text-center">
                   <div className="text-lg sm:text-2xl font-black text-[#317FA4]">{s.value}</div>
@@ -525,7 +544,7 @@ export default function Profile() {
 
           <div className="space-y-5 lg:col-span-1">
 
-            <SectionCard title="Job Preferences" icon={<IconPref />} onEdit={() => { setDraftPrefs({...prefs}); setModal("editPref"); }}>
+            <SectionCard title="Job Preferences" icon={<IconPref />} onEdit={() => { setDraftPrefs({ ...prefs }); setModal("editPref"); }}>
               <dl className="space-y-3 text-xs">
                 {[
                   ["Job Type", prefs.jobType],
@@ -583,13 +602,13 @@ export default function Profile() {
             <SectionCard title="Professional Summary" icon={<IconDoc />} onEdit={() => { setDraftSummary(summary); setModal("editSummary"); }}>
               <p className="text-sm text-gray-600 leading-relaxed">{summary}</p>
               <div className="mt-3 flex flex-wrap gap-2">
-                {["Open to Work","Available Immediately"].map((tag) => (
+                {["Open to Work", "Available Immediately"].map((tag) => (
                   <span key={tag} className="px-3 py-1 bg-emerald-50 text-emerald-700 text-[11px] font-semibold rounded-full border border-emerald-200">{tag}</span>
                 ))}
               </div>
             </SectionCard>
 
-            <SectionCard title="Work Experience" icon={<IconBriefcase />} onEdit={() => { setDraftExp({...emptyExp}); setEditingExpId(null); setModal("addExp"); }}>
+            <SectionCard title="Work Experience" icon={<IconBriefcase />} onEdit={() => { setDraftExp({ ...emptyExp }); setEditingExpId(null); setModal("addExp"); }}>
               <div className="space-y-5">
                 {experiences.map((exp, i) => (
                   <div key={exp.id} className={`relative pl-5 ${i < experiences.length - 1 ? "pb-5 border-b border-[#edf5f9]" : ""}`}>
@@ -601,7 +620,7 @@ export default function Profile() {
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
                         <span className="px-2.5 py-0.5 bg-[#eaf4f8] text-[#3385AA] text-[10px] font-semibold rounded-full">{exp.type}</span>
-                        <button onClick={() => { setDraftExp({...exp}); setEditingExpId(exp.id); setModal("editExp"); }}
+                        <button onClick={() => { setDraftExp({ ...exp }); setEditingExpId(exp.id); setModal("editExp"); }}
                           className="p-1 text-gray-400 hover:text-[#3385AA] hover:bg-[#eaf4f8] rounded transition-colors" title="Edit">
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </button>
@@ -625,14 +644,14 @@ export default function Profile() {
                   </div>
                 ))}
               </div>
-              <button onClick={() => { setDraftExp({...emptyExp}); setEditingExpId(null); setModal("addExp"); }}
+              <button onClick={() => { setDraftExp({ ...emptyExp }); setEditingExpId(null); setModal("addExp"); }}
                 className="mt-4 w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-[#aad5e6] rounded-xl text-xs font-semibold text-[#3385AA] hover:bg-[#eaf4f8] transition-colors">
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                 Add Experience
               </button>
             </SectionCard>
 
-            <SectionCard title="Education" icon={<IconGrad />} onEdit={() => { setDraftEdu({...emptyEdu}); setEditingEduId(null); setModal("addEdu"); }}>
+            <SectionCard title="Education" icon={<IconGrad />} onEdit={() => { setDraftEdu({ ...emptyEdu }); setEditingEduId(null); setModal("addEdu"); }}>
               <div className="space-y-4">
                 {education.map((edu, i) => (
                   <div key={edu.id} className={`relative pl-5 ${i < education.length - 1 ? "pb-4 border-b border-[#edf5f9]" : ""}`}>
@@ -647,7 +666,7 @@ export default function Profile() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1 flex-shrink-0">
-                        <button onClick={() => { setDraftEdu({...edu}); setEditingEduId(edu.id); setModal("editEdu"); }}
+                        <button onClick={() => { setDraftEdu({ ...edu }); setEditingEduId(edu.id); setModal("editEdu"); }}
                           className="p-1 text-gray-400 hover:text-[#3385AA] hover:bg-[#eaf4f8] rounded transition-colors" title="Edit">
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                         </button>
@@ -667,7 +686,7 @@ export default function Profile() {
                   </div>
                 ))}
               </div>
-              <button onClick={() => { setDraftEdu({...emptyEdu}); setEditingEduId(null); setModal("addEdu"); }}
+              <button onClick={() => { setDraftEdu({ ...emptyEdu }); setEditingEduId(null); setModal("addEdu"); }}
                 className="mt-4 w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-[#aad5e6] rounded-xl text-xs font-semibold text-[#3385AA] hover:bg-[#eaf4f8] transition-colors">
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                 Add Education
@@ -687,7 +706,7 @@ export default function Profile() {
               </div>
             </SectionCard>
 
-            <SectionCard title="Certifications" icon={<IconCert />} onEdit={() => { setDraftCert({...emptyCert}); setModal("addCert"); }}>
+            <SectionCard title="Certifications" icon={<IconCert />} onEdit={() => { setDraftCert({ ...emptyCert }); setModal("addCert"); }}>
               <ul className="space-y-3">
                 {certs.map((cert) => (
                   <li key={cert.id} className="flex items-center gap-3">
@@ -715,7 +734,7 @@ export default function Profile() {
                   </li>
                 ))}
               </ul>
-              <button onClick={() => { setDraftCert({...emptyCert}); setModal("addCert"); }}
+              <button onClick={() => { setDraftCert({ ...emptyCert }); setModal("addCert"); }}
                 className="mt-4 w-full flex items-center justify-center gap-1.5 py-2 border border-dashed border-[#aad5e6] rounded-xl text-xs font-semibold text-[#3385AA] hover:bg-[#eaf4f8] transition-colors">
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                 Add Certification
@@ -724,7 +743,7 @@ export default function Profile() {
 
           </div>
         </div>
-      </>) }</main>
+      </>)}</main>
 
       <Footer />
     </div>

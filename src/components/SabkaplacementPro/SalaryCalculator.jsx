@@ -1,367 +1,224 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import Navbar from '../Navbar'
-import Footer from '../Footer'
-import FloatingParticles from '../FloatingParticles'
+import React, { useState } from "react";
+import Navbar from "../Navbar";
+import Footer from "../Footer";
 
-const RESPONSIVE_CSS = `
-  .sc-body { max-width:1100px; margin:0 auto; padding:44px 28px 100px; }
-  .sc-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:28px; align-items:start; }
-  .sc-toggle-btn { padding:11px 38px; }
-  .sc-card { background:#fff; border-radius:22px; padding:30px 28px; box-shadow:0 6px 32px rgba(26,75,115,0.09); border:1.5px solid #e8f0fb; }
-  .sc-hero { padding:60px 24px 72px; }
-  .sc-hero h1 { font-size:clamp(2rem,4.5vw,3.2rem); }
-  .sc-hero p { font-size:1.05rem; }
-  .sc-summary { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
-  .sc-calc-btn { flex:1; padding:16px; font-size:1.05rem; }
-  .sc-reset-btn { padding:16px 24px; font-size:0.97rem; }
-  @media (max-width:768px) {
-    .sc-body { padding:28px 16px 80px; }
-    .sc-grid { grid-template-columns:1fr; gap:20px; }
-    .sc-toggle-btn { padding:10px 24px; font-size:0.88rem; }
-    .sc-card { padding:22px 18px; border-radius:18px; }
-    .sc-hero { padding:40px 16px 52px; }
-    .sc-hero h1 { font-size:clamp(1.6rem,6vw,2.2rem); }
-    .sc-hero p { font-size:0.95rem; }
-    .sc-summary { grid-template-columns:1fr 1fr 1fr; gap:8px; }
-    .sc-calc-btn { font-size:0.97rem; padding:14px; }
-    .sc-reset-btn { padding:14px 18px; font-size:0.9rem; }
-  }
-  @media (max-width:480px) {
-    .sc-body { padding:20px 12px 60px; }
-    .sc-toggle-btn { padding:9px 18px; font-size:0.82rem; }
-    .sc-card { padding:18px 14px; border-radius:16px; }
-    .sc-hero { padding:32px 14px 44px; }
-    .sc-summary { grid-template-columns:1fr 1fr 1fr; gap:6px; }
-    .sc-calc-btn { font-size:0.92rem; padding:13px; }
-    .sc-reset-btn { padding:13px 14px; font-size:0.85rem; }
-  }
-`
+const fmt = (n) => "₹" + Math.round(n).toLocaleString("en-IN");
 
-const fmt = (n) =>
-  Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 })
+const calcTax = (annual) => {
+  let tax = 0;
+  // New Tax Regime Slabs (Simplified for calculator)
+  if (annual <= 300000) tax = 0;
+  else if (annual <= 600000) tax = (annual - 300000) * 0.05;
+  else if (annual <= 900000) tax = 15000 + (annual - 600000) * 0.1;
+  else if (annual <= 1200000) tax = 45000 + (annual - 900000) * 0.15;
+  else if (annual <= 1500000) tax = 90000 + (annual - 1200000) * 0.2;
+  else tax = 150000 + (annual - 1500000) * 0.3;
+  
+  return Math.round(tax + tax * 0.04); // Including 4% Cess
+};
 
-function Field({ label, value, onChange, sublabel }) {
-  const [focused, setFocused] = useState(false)
-  return (
-    <div style={{ marginBottom: 20 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 7 }}>
-        <label style={{ fontSize: '0.93rem', fontWeight: 700, color: '#317FA4', letterSpacing: '0.01em' }}>{label}</label>
-        {sublabel && <span style={{ fontSize: '0.78rem', color: '#94a3b8', fontWeight: 500, fontStyle: 'italic' }}>{sublabel}</span>}
-      </div>
-      <div style={{ position: 'relative' }}>
-        <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: focused ? '#317FA4' : '#64748b', fontWeight: 800, fontSize: '1rem', transition: 'color 0.2s' }}>₹</span>
-        <input
-          type="number" min="0" value={value || ''}
-          onChange={e => onChange(e.target.value)}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          placeholder="0"
-          style={{
-            width: '100%', padding: '13px 14px 13px 32px',
-            border: `2px solid ${focused ? '#317FA4' : '#e2e8f0'}`,
-            borderRadius: 12, fontSize: '1rem', background: focused ? '#f0f6fc' : '#fafbfc',
-            outline: 'none', color: '#317FA4', fontWeight: 700,
-            boxShadow: focused ? '0 0 0 4px rgba(26,75,115,0.10)' : '0 1px 3px rgba(0,0,0,0.04)',
-            transition: 'all 0.2s', boxSizing: 'border-box',
-          }}
-        />
-      </div>
+const InputField = ({ label, hint, value, onChange, readOnly = false }) => (
+  <div className="mb-5">
+    <div className="flex justify-between items-center mb-2">
+      <label className="font-semibold text-[#1a3c5e] text-sm">{label}</label>
+      <span className="text-xs text-gray-400 italic">{hint}</span>
     </div>
-  )
-}
-
-function Bar({ label, amount, total, color }) {
-  const pct = total > 0 ? Math.min((amount / total) * 100, 100) : 0
-  return (
-    <div style={{ marginBottom: 14 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: '0.88rem' }}>
-        <span style={{ color: '#475569', fontWeight: 600 }}>{label}</span>
-        <span style={{ color: '#317FA4', fontWeight: 800 }}>₹{fmt(amount)}</span>
-      </div>
-      <div style={{ height: 8, background: '#f1f5f9', borderRadius: 99, overflow: 'hidden' }}>
-        <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 99, transition: 'width 0.7s cubic-bezier(.4,0,.2,1)' }} />
-      </div>
+    <div className="flex items-center border border-gray-200 rounded-xl px-4 py-3 bg-gray-50 focus-within:border-teal-400 transition">
+      <span className="text-gray-400 mr-2 text-sm">₹</span>
+      <input
+        type="number"
+        value={value}
+        onChange={onChange}
+        readOnly={readOnly}
+        min={0}
+        placeholder="0"
+        className="flex-1 bg-transparent outline-none text-gray-500 text-sm w-full"
+      />
     </div>
-  )
-}
+  </div>
+);
 
 export default function SalaryCalculator() {
-  const [mode, setMode] = useState('monthly') // monthly | yearly
+  const [mode, setMode] = useState("monthly");
+  const [basicSalary, setBasicSalary] = useState("");
+  const [hra, setHra] = useState("");
+  const [allowances, setAllowances] = useState("");
+  const [bonus, setBonus] = useState("");
+  const [pf, setPf] = useState("");
+  const [incomeTax, setIncomeTax] = useState("");
+  const [otherDed, setOtherDed] = useState("");
+  const [result, setResult] = useState(null);
 
-  // Earnings
-  const [basic,      setBasic]      = useState('')
-  const [hra,        setHra]        = useState('')
-  const [allowance,  setAllowance]  = useState('')
-  const [bonus,      setBonus]      = useState('')
-
-  // Deductions
-  const [pf,         setPf]         = useState('')
-  const [tax,        setTax]        = useState('')
-  const [otherDed,   setOtherDed]   = useState('')
-
-  const [result, setResult] = useState(null)
-
-  const parse = v => Number(v) || 0
+  const toNum = (v) => parseFloat(v) || 0;
 
   const calculate = () => {
-    const mult = mode === 'yearly' ? 1 : 12
+    const mult = mode === "monthly" ? 12 : 1;
 
-    const gross = (parse(basic) + parse(hra) + parse(allowance) + parse(bonus)) * mult
-    const totalDed = (parse(pf) + parse(tax) + parse(otherDed)) * mult
-    const net = gross - totalDed
-    const monthly = {
-      gross: gross / (mode === 'yearly' ? 12 : 1),
-      totalDed: totalDed / (mode === 'yearly' ? 12 : 1),
-      net: net / (mode === 'yearly' ? 12 : 1),
-    }
-    setResult({ gross, totalDed, net, monthly, mode,
-      breakdown: {
-        basic:     parse(basic)     * mult,
-        hra:       parse(hra)       * mult,
-        allowance: parse(allowance) * mult,
-        bonus:     parse(bonus)     * mult,
-        pf:        parse(pf)        * mult,
-        tax:       parse(tax)       * mult,
-        otherDed:  parse(otherDed)  * mult,
-      }
-    })
-  }
+    const annualBasic = toNum(basicSalary) * mult;
+    const annualHra = toNum(hra) * mult;
+    const annualAllowances = toNum(allowances) * mult;
+    const annualBonus = toNum(bonus) * mult;
+
+    const grossAnnual = annualBasic + annualHra + annualAllowances + annualBonus;
+
+    // Auto-calc PF if not manually entered (12% of basic, capped at 1800/month or as per rules)
+    // Here we use user's logic: 12% of basic or 21600 annual cap
+    const autoPF = toNum(pf) > 0 
+      ? toNum(pf) * mult 
+      : Math.min(annualBasic * 0.12, 21600);
+
+    // Auto-calc tax if not manually entered
+    const autoTax = toNum(incomeTax) > 0
+      ? toNum(incomeTax) * mult
+      : calcTax(Math.max(0, grossAnnual - autoPF - 75000)); // 75k standard deduction
+
+    const otherD = toNum(otherDed) * mult;
+    const pt = 2400; // Professional Tax
+
+    const totalDed = autoPF + autoTax + otherD + pt;
+    const inhand = grossAnnual - totalDed;
+
+    setResult({
+      grossAnnual,
+      autoPF,
+      autoTax,
+      otherD,
+      pt,
+      totalDed,
+      inhand,
+      monthlyInhand: Math.round(inhand / 12),
+    });
+  };
 
   const reset = () => {
-    setBasic(''); setHra(''); setAllowance(''); setBonus('')
-    setPf(''); setTax(''); setOtherDed(''); setResult(null)
-  }
+    setBasicSalary("");
+    setHra("");
+    setAllowances("");
+    setBonus("");
+    setPf("");
+    setIncomeTax("");
+    setOtherDed("");
+    setResult(null);
+  };
+
+  const inhandPct = result ? Math.round((result.inhand / result.grossAnnual) * 100) : 0;
+  const taxPct = result ? Math.round((result.autoTax / result.grossAnnual) * 100) : 0;
+  const pfPct = result ? Math.round((result.autoPF / result.grossAnnual) * 100) : 0;
 
   return (
-    <div style={{ background: 'linear-gradient(160deg,#f0f6fc 0%,#f8fafc 60%,#e8f4fb 100%)', minHeight: '100vh', fontFamily: 'system-ui,sans-serif' }}>
-      <style>{RESPONSIVE_CSS}</style>
+    <div className="min-h-screen bg-[#f0f4f8]">
       <Navbar />
-
-      {/* ── HERO ───────────────────────────────────────────── */}
-      <section className="sc-hero" style={{
-        background: 'linear-gradient(135deg,#317FA4 0%,#317FA4 55%,#2563a8 100%)',
-        textAlign: 'center', position: 'relative', overflow: 'hidden',
-      }}>
-        <FloatingParticles color="#3385AA" count={30} opacity={0.5} />
-        <div style={{ position:'absolute', top:-60, right:-60, width:340, height:340, borderRadius:'50%', background:'rgba(255,255,255,0.05)' }} />
-        <div style={{ position:'absolute', bottom:-80, left:-40, width:300, height:300, borderRadius:'50%', background:'rgba(255,255,255,0.04)' }} />
-        <div style={{ position:'absolute', top:'30%', left:'10%', width:120, height:120, borderRadius:'50%', background:'rgba(99,179,237,0.08)' }} />
-        <div style={{ position:'relative', maxWidth:660, margin:'0 auto' }}>
-          <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.1)', border:'1px solid rgba(255,255,255,0.18)', borderRadius:40, padding:'6px 18px', marginBottom:22 }}>
-            <span style={{ fontSize:'1.1rem' }}>💰</span>
-            <span style={{ color:'rgba(255,255,255,0.9)', fontSize:'0.82rem', fontWeight:700, letterSpacing:'0.08em' }}>SALARY CALCULATOR</span>
-          </div>
-          <h1 className="sc-hero-h1" style={{ fontWeight:900, color:'#fff', lineHeight:1.1, marginBottom:16, letterSpacing:'-0.02em' }}>
-            Know Your Exact
-            <span style={{ display:'block', background:'linear-gradient(90deg,#63b3ed,#90cdf4)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>In-Hand Salary</span>
-          </h1>
-          <p className="sc-hero-p" style={{ color:'rgba(255,255,255,0.72)', lineHeight:1.75, maxWidth:520, margin:'0 auto' }}>
-            Calculate your take-home pay with all allowances, deductions, PF and tax accounted for.
-          </p>
-        </div>
-      </section>
-
-      {/* ── CALCULATOR BODY ───────────────────────────────── */}
-      <div className="sc-body">
-
-        {/* ── TOGGLE — centered ────────────────────────── */}
-        <div style={{ display:'flex', justifyContent:'center', marginBottom:36 }}>
-          <div style={{ display:'inline-flex', background:'#fff', borderRadius:50, padding:5, border:'2px solid #e2e8f0', boxShadow:'0 4px 16px rgba(26,75,115,0.10)' }}>
-            {['monthly','yearly'].map(m => (
-              <button key={m} className="sc-toggle-btn" onClick={() => { setMode(m); setResult(null) }} style={{
-                borderRadius:44, border:'none', cursor:'pointer',
-                background: mode===m ? 'linear-gradient(90deg,#317FA4,#2563a8)' : 'transparent',
-                color: mode===m ? '#fff' : '#64748b',
-                fontWeight: mode===m ? 800 : 600,
-                transition: 'all 0.22s', textTransform:'capitalize',
-                boxShadow: mode===m ? '0 4px 16px rgba(26,75,115,0.28)' : 'none',
-                letterSpacing: '0.01em',
-              }}>{m === 'monthly' ? '📅 Monthly' : '📆 Yearly'}</button>
+      <div className="p-6">
+        {/* Mode Toggle */}
+        <div className="flex justify-center mb-8">
+          <div className="bg-white rounded-full p-1 flex shadow-sm border border-gray-100">
+            {["monthly", "yearly"].map((m) => (
+              <button
+                key={m}
+                onClick={() => { setMode(m); setResult(null); }}
+                className={`px-8 py-2 rounded-full text-sm font-semibold capitalize transition-all ${
+                  mode === m ? "bg-[#1a5276] text-white shadow" : "text-gray-400"
+                }`}
+              >
+                {m === "monthly" ? "📅" : "📆"} {m.charAt(0).toUpperCase() + m.slice(1)}
+              </button>
             ))}
           </div>
         </div>
 
-        <div className="sc-grid">
-
-        {/* ── LEFT: INPUTS ────────────────────────────────── */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-
-          {/* Earnings */}
-          <div className="sc-card" style={{ borderTop: '4px solid #317FA4' }}>
-            <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:24, paddingBottom:18, borderBottom:'1.5px solid #f0f6fc' }}>
-              <div style={{ width:44, height:44, borderRadius:14, background:'linear-gradient(135deg,#317FA4,#2563a8)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 4px 12px rgba(26,75,115,0.25)' }}>
-                <svg width="20" height="20" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              </div>
-              <div>
-                <div style={{ fontWeight:800, color:'#317FA4', fontSize:'1.08rem', letterSpacing:'-0.01em' }}>Salary Earnings</div>
-                <div style={{ fontSize:'0.8rem', color:'#64748b', marginTop:2 }}>Add all your income components</div>
-              </div>
-            </div>
-            <Field label="Basic Salary"   value={basic}     onChange={setBasic}     sublabel="Base pay" />
-            <Field label="HRA"            value={hra}       onChange={setHra}       sublabel="House Rent Allowance" />
-            <Field label="Other Allowances" value={allowance} onChange={setAllowance} sublabel="Transport, medical etc." />
-            <Field label="Bonus"          value={bonus}     onChange={setBonus}     sublabel="Performance / annual" />
-          </div>
-
-          {/* Deductions */}
-          <div className="sc-card" style={{ borderTop: '4px solid #e11d48' }}>
-            <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:24, paddingBottom:18, borderBottom:'1.5px solid #fff0f6' }}>
-              <div style={{ width:44, height:44, borderRadius:14, background:'linear-gradient(135deg,#be185d,#e11d48)', display:'flex', alignItems:'center', justifyContent:'center', boxShadow:'0 4px 12px rgba(225,29,72,0.22)' }}>
-                <svg width="20" height="20" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-              </div>
-              <div>
-                <div style={{ fontWeight:800, color:'#317FA4', fontSize:'1.08rem', letterSpacing:'-0.01em' }}>Deductions</div>
-                <div style={{ fontSize:'0.8rem', color:'#64748b', marginTop:2 }}>PF, Tax and other deductions</div>
-              </div>
-            </div>
-            <Field label="Provident Fund (PF)" value={pf}       onChange={setPf}       sublabel="12% of basic" />
-            <Field label="Income Tax"          value={tax}      onChange={setTax}      sublabel="TDS / advance tax" />
-            <Field label="Other Deductions"    value={otherDed} onChange={setOtherDed} sublabel="ESI, loan EMI etc." />
-          </div>
-
-          {/* Action buttons */}
-          <div style={{ display:'flex', gap:14 }}>
-            <button className="sc-calc-btn" onClick={calculate} style={{
-              flex:1, background:'linear-gradient(90deg,#317FA4,#2563a8)',
-              border:'none', borderRadius:16, fontWeight:800, color:'#fff',
-              cursor:'pointer', boxShadow:'0 8px 24px rgba(26,75,115,0.32)',
-              letterSpacing:'0.01em', transition:'transform 0.15s,box-shadow 0.15s',
-            }}
-              onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 12px 28px rgba(26,75,115,0.4)' }}
-              onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='0 8px 24px rgba(26,75,115,0.32)' }}
-            >Calculate Salary</button>
-            <button className="sc-reset-btn" onClick={reset} style={{
-              background:'#fff', border:'2px solid #e2e8f0',
-              borderRadius:16, fontWeight:700, color:'#64748b', cursor:'pointer',
-              transition:'all 0.15s',
-            }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor='#317FA4'; e.currentTarget.style.color='#317FA4' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor='#e2e8f0'; e.currentTarget.style.color='#64748b' }}
-            >Reset</button>
-          </div>
-        </div>
-
-        {/* ── RIGHT: RESULT ──────────────────────────────── */}
-        <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
-
-          {!result ? (
-            /* Placeholder */
-            <div className="sc-card" style={{ textAlign:'center', padding:'60px 28px', background:'linear-gradient(150deg,#f0f6fc,#fff)' }}>
-              <div style={{ width:80, height:80, borderRadius:'50%', background:'linear-gradient(135deg,#317FA4,#2563a8)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 22px', boxShadow:'0 8px 24px rgba(26,75,115,0.22)' }}>
-                <svg width="36" height="36" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M9 7H6a2 2 0 00-2 2v9a2 2 0 002 2h12a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
-              </div>
-              <div style={{ fontWeight:800, color:'#317FA4', fontSize:'1.2rem', marginBottom:10 }}>Enter your salary details</div>
-              <p style={{ color:'#94a3b8', fontSize:'0.92rem', lineHeight:1.8, margin:'0 auto', maxWidth:300 }}>
-                Fill in the earnings and deductions on the left, then click <strong style={{color:'#317FA4'}}>Calculate Salary</strong> to see your in-hand pay breakdown.
-              </p>
-            </div>
-          ) : (
-            <>
-              {/* NET SALARY CARD */}
-              <div style={{
-                background:'linear-gradient(135deg,#317FA4 0%,#317FA4 55%,#2563a8 100%)',
-                borderRadius:20, padding:'26px 24px', textAlign:'center',
-                boxShadow:'0 8px 30px rgba(26,75,115,0.3)', position:'relative', overflow:'hidden',
-              }}>
-                <div style={{ position:'absolute', top:-30, right:-30, width:130, height:130, borderRadius:'50%', background:'rgba(255,255,255,0.05)' }} />
-                <div style={{ position:'absolute', bottom:-20, left:-20, width:100, height:100, borderRadius:'50%', background:'rgba(255,255,255,0.04)' }} />
-                <div style={{ position:'relative' }}>
-                  <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(255,255,255,0.12)', borderRadius:30, padding:'4px 14px', marginBottom:12 }}>
-                    <span style={{ fontSize:'0.7rem', fontWeight:700, color:'rgba(255,255,255,0.8)', letterSpacing:'0.1em', textTransform:'uppercase' }}>Net In-Hand ({result.mode})</span>
-                  </div>
-                  <div style={{ display:'flex', alignItems:'baseline', justifyContent:'center', gap:4, marginBottom:5 }}>
-                    <span style={{ fontSize:'1.3rem', fontWeight:800, color:'#86efac', lineHeight:1 }}>₹</span>
-                    <span style={{ fontSize:'clamp(1.8rem,5vw,2.6rem)', fontWeight:900, color:'#4ade80', lineHeight:1, letterSpacing:'-0.02em' }}>{fmt(result.net)}</span>
-                  </div>
-                  <div style={{ fontSize:'0.8rem', color:'rgba(255,255,255,0.5)', marginBottom:10 }}>After all deductions</div>
-                  {result.mode === 'yearly' && (
-                    <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.1)', borderRadius:12, padding:'8px 16px' }}>
-                      <span style={{ color:'rgba(255,255,255,0.5)', fontSize:'0.78rem' }}>Monthly take-home:</span>
-                      <span style={{ color:'#fff', fontWeight:800, fontSize:'0.9rem' }}>₹{fmt(result.monthly.net)}</span>
-                    </div>
-                  )}
-                  {result.mode === 'monthly' && (
-                    <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.1)', borderRadius:12, padding:'8px 16px' }}>
-                      <span style={{ color:'rgba(255,255,255,0.5)', fontSize:'0.78rem' }}>Annual CTC:</span>
-                      <span style={{ color:'#fff', fontWeight:800, fontSize:'0.9rem' }}>₹{fmt(result.net * 12)}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* SUMMARY 3 cells */}
-              <div className="sc-summary">
-                {[
-                  { label:'Gross', value: result.gross, color:'#317FA4', bg:'#f5f8fc', border:'#e2e8f0',
-                    icon: <svg width="18" height="18" fill="none" stroke="#317FA4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg> },
-                  { label:'Deductions', value: result.totalDed, color:'#be185d', bg:'#fef0f5', border:'#e2e8f0',
-                    icon: <svg width="18" height="18" fill="none" stroke="#be185d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> },
-                  { label:'Net Salary', value: result.net, color:'#16a34a', bg:'#f0fdf4', border:'#e2e8f0',
-                    icon: <svg width="18" height="18" fill="none" stroke="#16a34a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> },
-                ].map((s,i) => (
-                  <div key={i} style={{ background:s.bg, borderRadius:14, padding:'14px 8px', textAlign:'center', border:`1.5px solid ${s.border}` }}>
-                    <div style={{ width:34, height:34, borderRadius:10, background:'#fff', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 10px', boxShadow:`0 2px 8px ${s.color}18` }}>{s.icon}</div>
-                    <div style={{ fontSize:'0.67rem', color:'#94a3b8', fontWeight:700, marginBottom:5, textTransform:'uppercase', letterSpacing:'0.08em' }}>{s.label}</div>
-                    <div style={{ display:'flex', alignItems:'baseline', justifyContent:'center', gap:2 }}>
-                      <span style={{ fontWeight:700, color:s.color, fontSize:'0.72rem' }}>₹</span>
-                      <span style={{ fontWeight:900, color:s.color, fontSize:'clamp(0.95rem,2vw,1.1rem)' }}>{fmt(s.value)}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* BREAKDOWN BARS */}
-              <div className="sc-card" style={{ borderTop:'4px solid #317FA4' }}>
-                <div style={{ fontWeight:800, color:'#317FA4', fontSize:'1.05rem', marginBottom:20, display:'flex', alignItems:'center', gap:8 }}>
-                  <span style={{ fontSize:'1.2rem' }}>📊</span> Earnings Breakdown
-                </div>
-                <Bar label="Basic Salary"     amount={result.breakdown.basic}     total={result.gross} color="linear-gradient(90deg,#317FA4,#2563a8)" />
-                <Bar label="HRA"              amount={result.breakdown.hra}       total={result.gross} color="linear-gradient(90deg,#0f766e,#14b8a6)" />
-                <Bar label="Other Allowances" amount={result.breakdown.allowance} total={result.gross} color="linear-gradient(90deg,#7c3aed,#a855f7)" />
-                <Bar label="Bonus"            amount={result.breakdown.bonus}     total={result.gross} color="linear-gradient(90deg,#b45309,#f97316)" />
-              </div>
-
-              <div className="sc-card" style={{ borderTop:'4px solid #e11d48' }}>
-                <div style={{ fontWeight:800, color:'#317FA4', fontSize:'1.05rem', marginBottom:20, display:'flex', alignItems:'center', gap:8 }}>
-                  <span style={{ fontSize:'1.2rem' }}>📉</span> Deductions Breakdown
-                </div>
-                <Bar label="Provident Fund (PF)"  amount={result.breakdown.pf}       total={result.gross} color="linear-gradient(90deg,#be185d,#f43f5e)" />
-                <Bar label="Income Tax"           amount={result.breakdown.tax}      total={result.gross} color="linear-gradient(90deg,#dc2626,#ef4444)" />
-                <Bar label="Other Deductions"     amount={result.breakdown.otherDed} total={result.gross} color="linear-gradient(90deg,#64748b,#94a3b8)" />
-
-                {/* Take-home percentage */}
-                <div style={{ marginTop:18, padding:'14px 18px', background:'linear-gradient(90deg,#f0f6fc,#e8f4fb)', borderRadius:14, display:'flex', justifyContent:'space-between', alignItems:'center', border:'1.5px solid #dbeafe' }}>
-                  <div>
-                    <div style={{ fontSize:'0.85rem', fontWeight:600, color:'#64748b' }}>Take-home percentage</div>
-                    <div style={{ fontSize:'0.75rem', color:'#94a3b8', marginTop:2 }}>Of your gross salary</div>
-                  </div>
-                  <span style={{ fontWeight:900, color:'#16a34a', fontSize:'1.3rem' }}>
-                    {result.gross > 0 ? ((result.net / result.gross) * 100).toFixed(1) : 0}%
-                  </span>
-                </div>
-              </div>
-
-              {/* Tip */}
-              <div style={{ background:'linear-gradient(135deg,#317FA4,#317FA4)', borderRadius:20, padding:'22px 26px', display:'flex', gap:14, alignItems:'flex-start', boxShadow:'0 6px 24px rgba(15,45,71,0.25)' }}>
-                <div style={{ width:42, height:42, borderRadius:12, background:'rgba(255,215,0,0.15)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                  <span style={{ fontSize:'1.4rem' }}>💡</span>
-                </div>
+        <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Inputs */}
+          <div className="flex flex-col gap-6">
+            <div className="bg-white rounded-2xl p-6 border-t-4 border-teal-600 shadow-sm">
+              <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
+                <div className="w-10 h-10 rounded-xl bg-[#1a5276] flex items-center justify-center text-white text-lg">₹</div>
                 <div>
-                  <div style={{ fontWeight:800, color:'#FFD700', fontSize:'0.95rem', marginBottom:7, letterSpacing:'0.02em' }}>Pro Tip</div>
-                  <p style={{ color:'rgba(255,255,255,0.72)', fontSize:'0.88rem', lineHeight:1.8, margin:0 }}>
-                    Your PF contribution is <strong style={{color:'#90cdf4'}}>{result.gross > 0 ? ((result.breakdown.pf / result.gross) * 100).toFixed(1) : 0}%</strong> of gross. The employer also adds an equal PF amount. Negotiate a higher in-hand by reducing voluntary PF contributions.
-                  </p>
+                  <h3 className="font-bold text-[#1a3c5e] text-base">Salary Earnings</h3>
+                  <p className="text-xs text-gray-400">Add all your income components</p>
                 </div>
               </div>
-            </>
-          )}
+              <InputField label="Basic Salary" hint="Base pay" value={basicSalary} onChange={(e) => setBasicSalary(e.target.value)} />
+              <InputField label="HRA" hint="House Rent Allowance" value={hra} onChange={(e) => setHra(e.target.value)} />
+              <InputField label="Other Allowances" hint="Transport, medical etc." value={allowances} onChange={(e) => setAllowances(e.target.value)} />
+              <InputField label="Bonus" hint="Performance / annual" value={bonus} onChange={(e) => setBonus(e.target.value)} />
+            </div>
 
-        </div>
+            <div className="bg-white rounded-2xl p-6 border-t-4 border-red-400 shadow-sm">
+              <div className="flex items-center gap-3 mb-5 pb-4 border-b border-gray-100">
+                <div className="w-10 h-10 rounded-xl bg-red-400 flex items-center justify-center text-white text-lg font-bold">−</div>
+                <div>
+                  <h3 className="font-bold text-[#1a3c5e] text-base">Deductions</h3>
+                  <p className="text-xs text-gray-400">PF, Tax and other deductions</p>
+                </div>
+              </div>
+              <InputField label="Provident Fund (PF)" hint="12% of basic (auto if empty)" value={pf} onChange={(e) => setPf(e.target.value)} />
+              <InputField label="Income Tax" hint="TDS / advance tax (auto if empty)" value={incomeTax} onChange={(e) => setIncomeTax(e.target.value)} />
+              <InputField label="Other Deductions" hint="ESI, loan EMI etc." value={otherDed} onChange={(e) => setOtherDed(e.target.value)} />
+              <div className="flex gap-3 mt-6">
+                <button onClick={calculate} className="flex-1 bg-[#1a5276] hover:bg-[#154360] text-white font-semibold py-3 rounded-xl transition-all text-sm">Calculate Salary</button>
+                <button onClick={reset} className="px-6 border border-gray-200 rounded-xl text-gray-500 hover:bg-gray-50 text-sm font-medium transition">Reset</button>
+              </div>
+            </div>
+          </div>
+
+          {/* Results */}
+          <div>
+            {!result ? (
+              <div className="bg-white rounded-2xl p-10 shadow-sm flex flex-col items-center justify-center min-h-[320px] text-center">
+                <div className="w-16 h-16 rounded-full bg-[#1a5276] flex items-center justify-center text-white text-2xl mb-5">⬇</div>
+                <h3 className="text-[#1a5276] font-bold text-lg mb-2">Enter your salary details</h3>
+                <p className="text-gray-400 text-sm leading-relaxed">Fill in the earnings and deductions on the left,<br />then click <strong className="text-gray-600">Calculate Salary</strong> to see your in-hand pay breakdown.</p>
+              </div>
+            ) : (
+              <div className="bg-white rounded-2xl p-6 shadow-sm">
+                <div className="bg-[#eaf4fb] rounded-xl p-6 mb-6 text-center">
+                  <p className="text-xs text-[#1a5276] font-bold mb-2 uppercase tracking-widest">Monthly In-Hand Salary</p>
+                  <p className="text-4xl font-black text-[#1a5276] mb-2">{fmt(result.monthlyInhand)}</p>
+                  <div className="h-px bg-[#1a5276]/10 w-1/2 mx-auto mb-2" />
+                  <p className="text-sm text-[#1a5276]/70 font-medium">Annual Net: {fmt(result.inhand)}</p>
+                </div>
+
+                <div className="flex h-3 rounded-full overflow-hidden mb-3 bg-gray-100">
+                  <div className="bg-teal-500" style={{ width: `${inhandPct}%` }} />
+                  <div className="bg-red-400" style={{ width: `${taxPct}%` }} />
+                  <div className="bg-blue-400" style={{ width: `${pfPct}%` }} />
+                </div>
+                
+                <div className="flex flex-wrap gap-4 text-[10px] font-bold text-gray-400 uppercase tracking-tighter mb-8">
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-teal-500" />In-hand {inhandPct}%</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-red-400" />Tax {taxPct}%</span>
+                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-blue-400" />PF {pfPct}%</span>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-3 rounded-xl bg-gray-50 border border-gray-100">
+                    <span className="text-gray-500 text-sm font-medium">Gross Annual Salary</span>
+                    <span className="text-[#1a3c5e] font-bold">{fmt(result.grossAnnual)}</span>
+                  </div>
+                  <div className="grid grid-cols-1 gap-2">
+                    {[
+                      { label: "Provident Fund (PF)", value: result.autoPF },
+                      { label: "Income Tax (TDS)", value: result.autoTax },
+                      { label: "Other Deductions", value: result.otherD },
+                      { label: "Professional Tax", value: result.pt },
+                    ].map((item) => (
+                      <div key={item.label} className="flex justify-between items-center px-4 py-2">
+                        <span className="text-gray-400 text-xs">{item.label}</span>
+                        <span className="text-red-400 text-xs font-semibold">− {fmt(item.value)}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-between items-center p-4 rounded-xl bg-[#1a5276] text-white shadow-lg shadow-blue-900/10">
+                    <span className="font-bold">Total Annual In-Hand</span>
+                    <span className="text-xl font-black">{fmt(result.inhand)}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
       <Footer />
     </div>
-  )
+  );
 }

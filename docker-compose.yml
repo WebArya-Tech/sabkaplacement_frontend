@@ -1,21 +1,15 @@
+version: "3.9"
+
 services:
   frontend:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: http://93.127.194.118:9020/api
+        VITE_APP_NAME: "Sabka Placement"
     container_name: sabkaplacement-frontend
+    restart: unless-stopped
     ports:
       - "9021:9021"
-    env_file:
-      - .env
-    environment:
-      - NODE_ENV=${NODE_ENV:-production}
-      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
-      - VITE_APP_NAME=${VITE_APP_NAME}
-    restart: unless-stopped
-    networks:
-      - sabkaplacement-network
-
-networks:
-  sabkaplacement-network:
-    driver: bridge
+      

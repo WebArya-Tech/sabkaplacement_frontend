@@ -59,3 +59,36 @@ export async function sendCandidateEmailOtp(email) {
   if (!res.ok) throw new Error(data.message || 'Failed to send OTP')
   return data.data ?? data
 }
+
+export async function requestPasswordReset(email) {
+  const res = await fetch(`${BASE_URL}/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email.trim().toLowerCase() }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Failed to send reset OTP')
+  return data.data ?? data
+}
+
+export async function verifyPasswordResetOtp(email, otp) {
+  const res = await fetch(`${BASE_URL}/auth/verify-otp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email.trim().toLowerCase(), otp }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Invalid or expired OTP')
+  return data.data ?? data
+}
+
+export async function resetPasswordWithOtp(resetToken, newPassword) {
+  const res = await fetch(`${BASE_URL}/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ resetToken, newPassword }),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.message || 'Failed to reset password')
+  return data.data ?? data
+}

@@ -84,7 +84,7 @@ export default function EmployeeLogin() {
                   <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-[#3385AA] focus:ring-[#3385AA]" />
                   <span className="text-xs text-gray-600">Remember me</span>
                 </label>
-                <button type="button" className="text-xs font-semibold text-[#3385AA] hover:underline">Forgot password?</button>
+                <button type="button" onClick={() => navigate('/forgot-password?role=company')} className="text-xs font-semibold text-[#3385AA] hover:underline">Forgot password?</button>
               </div>
 
               <button type="submit" disabled={loading}

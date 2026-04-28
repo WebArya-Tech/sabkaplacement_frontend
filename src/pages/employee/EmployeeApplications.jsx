@@ -3,7 +3,7 @@ import EmployeeNavbar from '../../components/EmployeeNavbar'
 import Footer from '../../components/EmployeeFooter'
 import { getCompanyApplications, updateCompanyApplicationStatus } from '../../services/companyApi'
 
-const statusOptions = ['Applied', 'Reviewed', 'Shortlisted', 'Rejected']
+const statusOptions = ['Applied', 'Seen', 'Reviewing', 'Shortlisted', 'Rejected']
 
 export default function EmployeeApplications() {
   const [applicants, setApplicants] = useState([])
@@ -26,6 +26,14 @@ export default function EmployeeApplications() {
     }
   }
 
+  const handleViewResume = (item) => {
+    window.open(item.resume, '_blank')
+    // If status is 'Seen' or 'Applied', update it to 'Reviewing'
+    if (item.status === 'Applied' || item.status === 'Seen') {
+      handleStatusChange(item._id, 'Reviewing')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#f0f6f9]">
       <EmployeeNavbar />
@@ -41,7 +49,7 @@ export default function EmployeeApplications() {
               <p className="text-sm text-gray-600 mt-1">Role: {item.jobId?.title || 'Job'}</p>
               {item.resume && (
                 <button
-                  onClick={() => window.open(item.resume, '_blank')}
+                  onClick={() => handleViewResume(item)}
                   className="mt-2 inline-flex items-center gap-1.5 text-xs font-bold text-[#317FA4] hover:text-[#42AFCA] bg-[#eaf4f8] px-3 py-1.5 rounded-lg border border-[#d6eaf2] transition-colors"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

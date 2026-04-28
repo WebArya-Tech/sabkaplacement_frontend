@@ -14,6 +14,7 @@ import Footer from './components copy/Footer'
 import HomePage from './pages/Home'
 import Login from './pages/auth/Login'
 import Register from './pages/auth/Register'
+import ForgotPassword from './pages/auth/ForgotPassword'
 import About from './pages/info/About'
 import CareerResources from './pages/info/CareerResources'
 import Contact from './pages/info/Contact'
@@ -188,6 +189,7 @@ function App() {
         <Route path="/home" element={<HomePage />} />
 
         <Route path="/login" element={<Login />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/register" element={<Register />} />
 
         {/* Employee routes — no TopBar/SocialSidebar needed, standalone pages */}
